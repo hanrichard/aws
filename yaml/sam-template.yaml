@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
 Description: Hello World with SAM
 Globals:
   Function:
@@ -6,35 +7,34 @@ Globals:
     Runtime: nodejs8.10
     Timeout: 5
 Resources:
-  MyBucket:
-    Type: AWS::S3::Bucket
-  addNumbers:
-    Properties:
-      CodeUri: s3://riyaz-sam/6740b7a0c975f8f01fed5134a4ebff34
-      Events:
-        PostAdd:
-          Properties:
-            Method: post
-            Path: /add
-          Type: Api
-      Handler: add.handler
-    Type: AWS::Serverless::Function
   eventLogger:
+    Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://riyaz-sam/6740b7a0c975f8f01fed5134a4ebff34
+      Handler: logger.handler
+      Timeout: 3
       Events:
+        GetLogs:
+          Type: Api
+          Properties:
+            Path: /logs
+            Method: get
         FileUpload:
+          Type: S3
           Properties:
             Bucket:
               Ref: MyBucket
             Events: s3:ObjectCreated:*
-          Type: S3
-        GetLogs:
-          Properties:
-            Method: get
-            Path: /logs
-          Type: Api
-      Handler: logger.handler
-      Timeout: 3
+      CodeUri: s3://hanrichard/8ad0108aaa741a68905d6616d1cc2171
+  MyBucket:
+    Type: AWS::S3::Bucket
+  addNumbers:
     Type: AWS::Serverless::Function
-Transform: AWS::Serverless-2016-10-31
+    Properties:
+      Handler: add.handler
+      Events:
+        PostAdd:
+          Type: Api
+          Properties:
+            Path: /add
+            Method: post
+      CodeUri: s3://hanrichard/8ad0108aaa741a68905d6616d1cc2171
